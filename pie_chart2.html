@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: Pie layout</title>
+		<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+		
+		<style type="text/css">
+
+			text {
+				font-family: sans-serif;
+				font-size: 12px;
+				fill: white;
+			}
+
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+$(document).ready(function(){ 
+			//Width and height
+			var w = 600;
+			var h = 600;
+
+			//var dataset = [ 5, 10, 20, 45, 6, 13 ];
+			
+			var dataset = [{"player":"David Ortiz","RBI":57},{"player":"Mookie Betts","RBI":47},{"player":"Xander Bogaerts","RBI":45},{"player":"Jackie Bradley","RBI":44},{"player":"Dustin Pedroia","RBI":27},{"player":"Travis Shaw","RBI":37}];
+			
+			var outerRadius = w / 2;
+			var innerRadius = 100;
+			var arc = d3.svg.arc()
+							.innerRadius(innerRadius)
+							.outerRadius(outerRadius);
+			
+			var pie = d3.layout.pie()
+			.value(function(d) { return d.RBI; }) 
+			.sort( function(d) { return null; } );
+			
+			var color = d3.scale.category20b();
+
+			//Create SVG element
+			var svg = d3.select("#pie-demo")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+			
+			//Set up groups
+			var arcs = svg.selectAll("g.arc")
+						  .data(pie(dataset))
+						  .enter()
+						  .append("g")
+						  .attr("class", "arc")
+						  .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+			
+			//Draw arc paths
+			arcs.append("path")
+			    .attr("fill", function(d, i) {
+			    	return color(i);
+			    })
+			    .attr("d", arc);
+			
+			//Labels
+			arcs.append("text")
+			    .attr("transform", function(d) {
+			    	return "translate(" + arc.centroid(d) + ")";
+			    })
+			    .attr("text-anchor", "middle")
+				.style("font", "12px Verdana")
+					.text(function(d, i) {
+					return dataset[i].player + ' (' + d.value + ')';
+			    });
+		
+		svg.append("text").text("Red Sox Runs Batted In")
+			.attr("x", w/2)
+			.attr("y", 300)
+			.attr("text-anchor", "middle")
+			.style("font-size", "14px")
+			.style("font-weight", "bold" )
+			.style("fill", "black");
+	});  	
+						
+		</script>
+		<div id="pie-demo"  style="position: relative; top: 20px; left: 30px;"></div>
+		
+	</body>
+</html>

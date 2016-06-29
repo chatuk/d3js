@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+path {
+  stroke-linejoin: round;
+}
+
+.land {
+  fill: #ddd;
+}
+
+.counties {
+  stroke: #fff;
+}
+
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+var data=[{"53073":89,"30105":22,"30029":170, "30041":1, "25015": 1, "17111": 185, "17201": 150, "26075": 256, "56001": 25, "19171":21, "72119":355, "2050":1}];
+
+var width = 960,
+    height = 500;
+
+var projection = d3.geo.albersUsa();
+
+var color_scale = d3.scale.quantize()
+  .domain(d3.values(data[0]))
+  .range(["#ffd700","#f0e68c","#bdb76b","#fafad2"]);
+  
+var path = d3.geo.path()
+    .projection(projection)
+    .pointRadius(1);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+queue()
+    .defer(d3.json, "us.json")
+    .await(ready);
+
+function ready(error, us) {
+  svg.append("path")
+      .datum(topojson.feature(us, us.objects.land))
+      .attr("class", "land")
+      .attr("d", path);
+
+svg.append("g")
+      .attr("class", "counties")
+      .selectAll("path")
+      .data(topojson.feature(us, us.objects.counties).features)
+      .enter().append("path")
+      .attr("d", path)
+      .style("fill", function(d){return color_scale(data[0][d.id]);});
+
+}
+</script>
+
+</body>
+
+</html>
